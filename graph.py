@@ -11,10 +11,28 @@ class Node(object):
 	def __str__(self):
 		return str(self.id) + "[" +  str(self.energy) + "]"
 
+class GraphInfo(object):
+
+	def __init__(self):
+		self.numberNodes = 0
+		self.energy = (0, 100)
+
 class Graph(object):
 	"""
 
 	"""
+	@staticmethod
+	def generate(graphInfo):
+
+		graph = Graph()
+
+		low, high = graphInfo.energy
+
+		for time in range(graphInfo.numberNodes):
+			energy = random.randint(low, high)
+			graph.addNode(energy)
+
+		return graph
 
 	def __init__(self):
 		self.nodes = []
@@ -118,17 +136,15 @@ class SpaningTreeGenerator(object):
 				graph.addEdge(fr, to, val)
 			
 
-myGraph = Graph()
-myGraph.addNode(10)
-myGraph.addNode(15)
-myGraph.addNode(20)
-myGraph.addNode(26)
-myGraph.addNode(17)
-myGraph.addNode(18)
-myGraph.addNode(25)
-myGraph.addNode(24)
-myGraph.addNode(22)
-myGraph.printInfo()
+# graphInfo = GraphInfo()
+# graphInfo.energy = (15, 20)
+# graphInfo.numberNodes = 25
 
-generator = SpaningTreeGenerator()
-generator.generate(myGraph, weightEnergy)
+# myGraph = Graph.generate(graphInfo)
+
+# myGraph.printInfo()
+
+# generator = SpaningTreeGenerator()
+# generator.generate(myGraph, weightEnergy)
+
+# myGraph.printInfo()
