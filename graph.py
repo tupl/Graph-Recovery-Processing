@@ -37,6 +37,7 @@ class Graph(object):
 	def __init__(self):
 		self.nodes = []
 		self.adjList = {}
+		self.numberEdges = 0
 
 	def getNode(self, id):
 		return self.nodes[id]
@@ -58,6 +59,15 @@ class Graph(object):
 			print("AdjList for node " + str(fr))
 			print(str(self.adjList[fr]))
 
+	def saveEdgesInFile(self, filename):
+
+		with open(filename, 'w') as fi:
+			for fr in self.adjList:
+				myNeighbor = self.adjList[fr]
+				for to in myNeighbor:
+					nstr = str(fr) + " " + str(to) + " " + str(myNeighbor[to])
+					fi.write(nstr + "\n")
+
 	def updateEdge(self, fr, to, weight):
 		# update this edge with new weight
 		self.adjList[fr][to] = weight
@@ -65,12 +75,18 @@ class Graph(object):
 	def getAdjListOfNode(self, fr):
 		return self.adjList[fr]
 
+	def getNumberOfEdges(self):
+		return len(self.numberEdges)
+
 	def getNumberOfNodes(self):
 		return len(self.nodes)
 
 	def addEdge(self, fr, to, weight):
 		if fr not in self.adjList:
 			self.adjList[fr] = {}
+		if to not in self.adjList[fr]:
+			# we add a new edge
+			self.numberEdges += 1
 		self.adjList[fr][to] = weight
 
 	def addNode(self, energy, name=None):
@@ -152,8 +168,6 @@ class SpaningTreeGenerator(object):
 
 		n = graph.getNumberOfNodes()
 
-		print("There are " + str(n) + " nodes in the graph.")
-
 		reachable = Set([0])
 		non_reachable = Set([])
 
@@ -177,21 +191,23 @@ class SpaningTreeGenerator(object):
 
 
 graphInfo = GraphInfo()
-graphInfo.energy = (15, 20)
-graphInfo.numberNodes = 25
+graphInfo.energy = (10, 40)
+graphInfo.numberNodes = 10
 
 myGraph = Graph.generate(graphInfo)
 
-myGraph.printInfo()
+# myGraph.printInfo()
 
 generator = SpaningTreeGenerator()
 generator.generate(myGraph, weightEnergy)
 
-print
-myGraph.printInfo()
+# print
+# myGraph.printInfo()
 
 edgeGenerator = EdgeAppendGenerator()
-edgeGenerator.generate(myGraph, 80)
+edgeGenerator.generate(myGraph, 10)
 
-print
-myGraph.printInfo()
+# print
+# myGraph.printInfo()
+
+myGraph.saveEdgesInFile("out.grp")
