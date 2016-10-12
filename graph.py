@@ -19,7 +19,7 @@ class GraphInfo(object):
 
 class Graph(object):
 	"""
-
+		Construct a directed graph.
 	"""
 	@staticmethod
 	def generate(graphInfo):
@@ -29,7 +29,7 @@ class Graph(object):
 		low, high = graphInfo.energy
 
 		for time in range(graphInfo.numberNodes):
-			energy = random.randint(low, high)
+			energy = random.uniform(low, high)
 			graph.addNode(energy)
 
 		return graph
@@ -40,6 +40,11 @@ class Graph(object):
 
 	def getNode(self, id):
 		return self.nodes[id]
+
+	def isEdgeInGraph(self, fr, to):
+		if fr not in self.adjList:
+			return False # this edge not in the graph
+		return to in self.adjList[fr]
 
 	def printInfo(self):
 		print("Nodes in the graph")
@@ -81,6 +86,41 @@ def weightEnergy(nodeFr, nodeTo):
 def getSetRandomlyPick(aset):
 	ls = list(aset)
 	return random.choice(ls)
+
+class EdgeAppendGenerator(object):
+
+	def generate(self, graph, numberEdges):
+		"""
+			How many edge you want to add to this graph
+
+		"""
+
+		idx = 0
+
+		numberNodes = graph.getNumberOfNodes()
+		choices = list(range(numberNodes))
+
+		while idx <= numberEdges:
+
+			# an edge not in graph if its (fr, to) or
+			# (to, fr) are not in the graph
+
+			[fr, to] = random.sample(choices, 2)
+
+			stt1 = graph.isEdgeInGraph(fr, to)
+			stt2 = graph.isEdgeInGraph(to, fr)
+
+			if stt1 or stt2:
+				# if its is in the graph, ignore this cycle
+				continue
+
+			idx += 1
+
+			nodeFr = graph.getNode(fr)
+			nodeTo = graph.getNode(to)
+
+			graph.addEdge(fr, to, weightEnergy(nodeFr, nodeTo))
+
 
 class SpaningTreeGenerator(object):
 	"""
@@ -134,17 +174,24 @@ class SpaningTreeGenerator(object):
 			if operator:
 				val = operator(nodeFr,nodeTo)
 				graph.addEdge(fr, to, val)
-			
 
-# graphInfo = GraphInfo()
-# graphInfo.energy = (15, 20)
-# graphInfo.numberNodes = 25
 
-# myGraph = Graph.generate(graphInfo)
+graphInfo = GraphInfo()
+graphInfo.energy = (15, 20)
+graphInfo.numberNodes = 25
 
-# myGraph.printInfo()
+myGraph = Graph.generate(graphInfo)
 
-# generator = SpaningTreeGenerator()
-# generator.generate(myGraph, weightEnergy)
+myGraph.printInfo()
 
-# myGraph.printInfo()
+generator = SpaningTreeGenerator()
+generator.generate(myGraph, weightEnergy)
+
+print
+myGraph.printInfo()
+
+edgeGenerator = EdgeAppendGenerator()
+edgeGenerator.generate(myGraph, 80)
+
+print
+myGraph.printInfo()
