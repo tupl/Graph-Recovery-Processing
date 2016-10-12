@@ -59,6 +59,11 @@ class Graph(object):
 			print("AdjList for node " + str(fr))
 			print(str(self.adjList[fr]))
 
+	def saveAsPickeInFile(self, filename):
+		import pickle
+
+		pickle.dump(self, open(filename, "wb"))
+
 	def saveEdgesInFile(self, filename):
 
 		with open(filename, 'w') as fi:
@@ -211,3 +216,4 @@ edgeGenerator.generate(myGraph, 10)
 # myGraph.printInfo()
 
 myGraph.saveEdgesInFile("out.grp")
+myGraph.saveAsPickeInFile("out.pkl")
