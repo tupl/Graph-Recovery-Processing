@@ -229,8 +229,11 @@ if __name__ == "__main__":
     cycles = readCycleMatrix("matrix.txt", orders)
     graph = Graph.loadAsPickleInFile("out.pkl")
 
+    graph.printInfo()
+
     # update 1 -> 8
     graph.updateEdge(1, 8, -11.0)
+    graph.updateEdge(2, 3, -3.0)
 
     getSortedListBadEdges(graph, cycles)
     
