@@ -1,6 +1,38 @@
 from sets import Set
 import random
 
+class Edge(object):
+
+    def __init__(self, fr, to):
+        self.fr = fr
+        self.to = to
+
+    def __str__(self):
+        return str(self.fr) + " -> " + str(self.to)
+
+    def __repr__(self):
+        return str(self)
+
+    def __hash__(self):
+        return hash((self.fr, self.to))
+
+    def __eq__(self, other):
+        return (self.fr, self.to) == (other.fr, other.to)
+
+    def __ne__(self, other):
+        # Not strictly necessary, but to avoid having both x==y and x!=y
+        # True at the same time
+        return not(self == other) 
+
+class WeightedEdge(Edge):
+
+    def __init__(self, fr, to, weight):
+        super(WeightedEdge, self).__init__(fr, to)
+        self.weight = weight
+
+    def __str__(self):
+        return str(self.fr) + " -> " + str(self.to) + "[" + str(self.weight) + "]"
+
 class Node(object):
 
 	def __init__(self, id, energy, name=None):
@@ -39,6 +71,14 @@ class Graph(object):
 		self.adjList = {}
 		self.numberEdges = 0
 
+	def getWeightWithEdge(self, edge):
+		fr = edge.fr
+		to = edge.to
+
+		if fr in self.adjList and to in self.adjList[fr]:
+			return self.adjList[fr][to]
+		return - self.adjList[to][fr]
+
 	def getNode(self, id):
 		return self.nodes[id]
 
@@ -59,7 +99,13 @@ class Graph(object):
 			print("AdjList for node " + str(fr))
 			print(str(self.adjList[fr]))
 
-	def saveAsPickeInFile(self, filename):
+	@staticmethod
+	def loadAsPickleInFile(filename):
+		import pickle
+
+		return pickle.load(open(filename, "rb" ))
+
+	def saveAsPickleInFile(self, filename):
 		import pickle
 
 		pickle.dump(self, open(filename, "wb"))
@@ -195,25 +241,26 @@ class SpaningTreeGenerator(object):
 				graph.addEdge(fr, to, val)
 
 
-graphInfo = GraphInfo()
-graphInfo.energy = (10, 40)
-graphInfo.numberNodes = 10
+if __name__ == "__main__":
+	graphInfo = GraphInfo()
+	graphInfo.energy = (10, 40)
+	graphInfo.numberNodes = 10
 
-myGraph = Graph.generate(graphInfo)
+	myGraph = Graph.generate(graphInfo)
 
-# myGraph.printInfo()
+	# myGraph.printInfo()
 
-generator = SpaningTreeGenerator()
-generator.generate(myGraph, weightEnergy)
+	generator = SpaningTreeGenerator()
+	generator.generate(myGraph, weightEnergy)
 
-# print
-# myGraph.printInfo()
+	# print
+	# myGraph.printInfo()
 
-edgeGenerator = EdgeAppendGenerator()
-edgeGenerator.generate(myGraph, 10)
+	edgeGenerator = EdgeAppendGenerator()
+	edgeGenerator.generate(myGraph, 10)
 
-# print
-# myGraph.printInfo()
+	# print
+	myGraph.printInfo()
 
-myGraph.saveEdgesInFile("out.grp")
-myGraph.saveAsPickeInFile("out.pkl")
+	myGraph.saveEdgesInFile("out.grp")
+	myGraph.saveAsPickleInFile("out.pkl")
