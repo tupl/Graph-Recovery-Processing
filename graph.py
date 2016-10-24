@@ -7,6 +7,10 @@ class Edge(object):
         self.fr = fr
         self.to = to
 
+    def reverse(self):
+        edge = Edge(self.to, self.fr)
+        return edge
+
     def __str__(self):
         return str(self.fr) + " -> " + str(self.to)
 
@@ -22,7 +26,7 @@ class Edge(object):
     def __ne__(self, other):
         # Not strictly necessary, but to avoid having both x==y and x!=y
         # True at the same time
-        return not(self == other) 
+        return not(self == other)
 
 class WeightedEdge(Edge):
 
@@ -31,236 +35,276 @@ class WeightedEdge(Edge):
         self.weight = weight
 
     def __str__(self):
-        return str(self.fr) + " -> " + str(self.to) + "[" + str(self.weight) + "]"
+        return str(self.fr) + " -> " + str(self.to) + "{" + str(self.weight) + "}"
 
 class Node(object):
 
-	def __init__(self, id, energy, name=None):
-		self.id = id
-		self.name = name
-		self.energy = energy
+    def __init__(self, id, energy, name=None):
+        self.id = id
+        self.name = name
+        self.energy = energy
 
-	def __str__(self):
-		return str(self.id) + "[" +  str(self.energy) + "]"
+    def __str__(self):
+        return str(self.id) + "[" +  str(self.energy) + "]"
 
 class GraphInfo(object):
 
-	def __init__(self):
-		self.numberNodes = 0
-		self.energy = (0, 100)
+    def __init__(self):
+        self.numberNodes = 0
+        self.energy = (0, 100)
 
 class Graph(object):
-	"""
-		Construct a directed graph.
-	"""
-	@staticmethod
-	def generate(graphInfo):
+    """
+        Construct a directed graph.
+    """
+    @staticmethod
+    def generate(graphInfo):
 
-		graph = Graph()
+        graph = Graph()
 
-		low, high = graphInfo.energy
+        low, high = graphInfo.energy
 
-		for time in range(graphInfo.numberNodes):
-			energy = random.uniform(low, high)
-			graph.addNode(energy)
+        for time in range(graphInfo.numberNodes):
+            energy = random.uniform(low, high)
+            graph.addNode(energy)
 
-		return graph
+        return graph
 
-	def __init__(self):
-		self.nodes = []
-		self.adjList = {}
-		self.numberEdges = 0
+    def __init__(self):
+        self.nodes = []
+        self.adjList = {}
+        self.numberEdges = 0
 
-	def getWeightWithEdge(self, edge):
-		fr = edge.fr
-		to = edge.to
+    def getWeightWithEdge(self, edge):
+        fr = edge.fr
+        to = edge.to
 
-		if fr in self.adjList and to in self.adjList[fr]:
-			return self.adjList[fr][to]
-		return - self.adjList[to][fr]
+        if fr in self.adjList and to in self.adjList[fr]:
+            return self.adjList[fr][to]
+        return - self.adjList[to][fr]
 
-	def getNode(self, id):
-		return self.nodes[id]
+    def getNode(self, id):
+        return self.nodes[id]
 
-	def isEdgeInGraph(self, fr, to):
-		if fr not in self.adjList:
-			return False # this edge not in the graph
-		return to in self.adjList[fr]
+    def isEdgeInGraph(self, fr, to):
+        if fr not in self.adjList:
+            return False # this edge not in the graph
+        return to in self.adjList[fr]
 
-	def printInfo(self):
-		print("Nodes in the graph")
+    def printInfo(self):
+        print("Nodes in the graph")
 
-		for n in self.nodes:
-			print(n)
+        for n in self.nodes:
+            print(n)
 
-		print("Edges in the graph")
+        print("Edges in the graph")
 
-		for fr in self.adjList:
-			print("AdjList for node " + str(fr))
-			print(str(self.adjList[fr]))
+        for fr in self.adjList:
+            print("AdjList for node " + str(fr))
+            print(str(self.adjList[fr]))
 
-	@staticmethod
-	def loadAsPickleInFile(filename):
-		import pickle
+    @staticmethod
+    def loadAsPickleInFile(filename):
+        import pickle
 
-		return pickle.load(open(filename, "rb" ))
+        return pickle.load(open(filename, "rb" ))
 
-	def saveAsPickleInFile(self, filename):
-		import pickle
+    def saveAsPickleInFile(self, filename):
+        import pickle
 
-		pickle.dump(self, open(filename, "wb"))
+        pickle.dump(self, open(filename, "wb"))
 
-	def saveEdgesInFile(self, filename):
+    def saveEdgesInFile(self, filename):
 
-		with open(filename, 'w') as fi:
-			for fr in self.adjList:
-				myNeighbor = self.adjList[fr]
-				for to in myNeighbor:
-					nstr = str(fr) + " " + str(to) + " " + str(myNeighbor[to])
-					fi.write(nstr + "\n")
+        with open(filename, 'w') as fi:
+            for fr in self.adjList:
+                myNeighbor = self.adjList[fr]
+                for to in myNeighbor:
+                    nstr = str(fr) + " " + str(to) + " " + str(myNeighbor[to])
+                    fi.write(nstr + "\n")
 
-	def updateEdge(self, fr, to, weight):
-		# update this edge with new weight
-		self.adjList[fr][to] = weight
+    def updateEdge(self, fr, to, weight):
+        # update this edge with new weight
+        if fr in self.adjList and to in self.adjList[fr]:
+            self.adjList[fr][to] = weight
+        elif to in self.adjList and fr in self.adjList[to]:
+            self.adjList[to][fr] = - weight
 
-	def getAdjListOfNode(self, fr):
-		return self.adjList[fr]
+    def shiftEdge(self, fr, to, sf_weight):
+        if fr in self.adjList and to in self.adjList[fr]:
+            self.adjList[fr][to] += sf_weight
+        elif to in self.adjList and fr in self.adjList[to]:
+            self.adjList[to][fr] -= sf_weight      
 
-	def getNumberOfEdges(self):
-		return len(self.numberEdges)
+    def getAdjListOfNode(self, fr):
+        return self.adjList[fr]
 
-	def getNumberOfNodes(self):
-		return len(self.nodes)
+    def getNumberOfEdges(self):
+        return len(self.numberEdges)
 
-	def addEdge(self, fr, to, weight):
-		if fr not in self.adjList:
-			self.adjList[fr] = {}
-		if to not in self.adjList[fr]:
-			# we add a new edge
-			self.numberEdges += 1
-		self.adjList[fr][to] = weight
+    def getNumberOfNodes(self):
+        return len(self.nodes)
 
-	def addNode(self, energy, name=None):
-		nextId = len(self.nodes)
-		n = Node(nextId, energy, name)
-		self.nodes.append(n)
+    def addEdge(self, fr, to, weight):
+        if fr not in self.adjList:
+            self.adjList[fr] = {}
+        if to not in self.adjList[fr]:
+            # we add a new edge
+            self.numberEdges += 1
+        self.adjList[fr][to] = weight
 
-		return n
+    def addNode(self, energy, name=None):
+        nextId = len(self.nodes)
+        n = Node(nextId, energy, name)
+        self.nodes.append(n)
+
+        return n
 
 def weightEnergy(nodeFr, nodeTo):
-	return nodeTo.energy - nodeFr.energy
+    return nodeTo.energy - nodeFr.energy
 
 def getSetRandomlyPick(aset):
-	ls = list(aset)
-	return random.choice(ls)
+    ls = list(aset)
+    return random.choice(ls)
 
 class EdgeAppendGenerator(object):
 
-	def generate(self, graph, numberEdges):
-		"""
-			How many edge you want to add to this graph
+    def generate(self, graph, numberEdges):
+        """
+            How many edge you want to add to this graph
 
-		"""
+        """
 
-		idx = 0
+        idx = 0
 
-		numberNodes = graph.getNumberOfNodes()
-		choices = list(range(numberNodes))
+        numberNodes = graph.getNumberOfNodes()
+        choices = list(range(numberNodes))
 
-		while idx <= numberEdges:
+        while idx <= numberEdges:
 
-			# an edge not in graph if its (fr, to) or
-			# (to, fr) are not in the graph
+            # an edge not in graph if its (fr, to) or
+            # (to, fr) are not in the graph
 
-			[fr, to] = random.sample(choices, 2)
+            [fr, to] = random.sample(choices, 2)
 
-			stt1 = graph.isEdgeInGraph(fr, to)
-			stt2 = graph.isEdgeInGraph(to, fr)
+            stt1 = graph.isEdgeInGraph(fr, to)
+            stt2 = graph.isEdgeInGraph(to, fr)
 
-			if stt1 or stt2:
-				# if its is in the graph, ignore this cycle
-				continue
+            if stt1 or stt2:
+                # if its is in the graph, ignore this cycle
+                continue
 
-			idx += 1
+            idx += 1
 
-			nodeFr = graph.getNode(fr)
-			nodeTo = graph.getNode(to)
+            nodeFr = graph.getNode(fr)
+            nodeTo = graph.getNode(to)
 
-			graph.addEdge(fr, to, weightEnergy(nodeFr, nodeTo))
+            graph.addEdge(fr, to, weightEnergy(nodeFr, nodeTo))
 
+class GraphPerputator(object):
+
+    def __init__(self, small, large):
+        self.small = small
+        self.large = large
+
+    def execute(self, graph, percent):
+
+        small = self.small
+        large = self.large
+        err = []
+
+        print("Perputating the graph")
+        for fr in graph.adjList:
+            for to in graph.adjList[fr]:
+                prob = random.random()
+                val = 0
+                # how many percent random large
+                if prob <= percent:
+                    val = random.uniform(large[0], large[1])
+                else:
+                    val = random.uniform(small[0], small[1])
+                # print("%f --> %f" %
+                #     (graph.adjList[fr][to],
+                #      graph.adjList[fr][to] + val
+                #     ))
+                err.append(val)
+                graph.shiftEdge(fr, to, val)
+
+        import numpy as np
+        print(np.absolute(np.array(err)))
 
 class SpaningTreeGenerator(object):
-	"""
-		It takes a Graph object, and add edge to make it
-		become a spanning tree
-	"""
+    """
+        It takes a Graph object, and add edge to make it
+        become a spanning tree
+    """
 
-	def __init__(self):
-		pass
+    def __init__(self):
+        pass
 
-	def generate(self, graph, operator = None):
-		"""
-		By the default, if it add an edge with weight 0,
-		if is has operator, it will ask operator to return
-		a weight for two node
-			operator(node1, node2) --> weight
+    def generate(self, graph, operator = None):
+        """
+        By the default, if it add an edge with weight 0,
+        if is has operator, it will ask operator to return
+        a weight for two node
+            operator(node1, node2) --> weight
 
-		Algorithm:
-			- keep track of reachable node and unreachable
-			node.
-			- at beginning, put node 0 into reachable
-			- at any time, we make an edge from
-			reachable node to non-reachable node
-			- we move the new non-reachable node to reachable node
-			- repeat it exactly n - 1 time
-		"""
-		if graph.getNumberOfNodes() == 0:
-			raise Exception("Required at least one node")
+        Algorithm:
+            - keep track of reachable node and unreachable
+            node.
+            - at beginning, put node 0 into reachable
+            - at any time, we make an edge from
+            reachable node to non-reachable node
+            - we move the new non-reachable node to reachable node
+            - repeat it exactly n - 1 time
+        """
+        if graph.getNumberOfNodes() == 0:
+            raise Exception("Required at least one node")
 
-		n = graph.getNumberOfNodes()
+        n = graph.getNumberOfNodes()
 
-		reachable = Set([0])
-		non_reachable = Set([])
+        reachable = Set([0])
+        non_reachable = Set([])
 
-		for v in range(1, n):
-			# add each node v into non-reachable node
-			non_reachable.add(v)
+        for v in range(1, n):
+            # add each node v into non-reachable node
+            non_reachable.add(v)
 
-		for time in range(0, n - 1):
-			fr = getSetRandomlyPick(reachable)
-			to = getSetRandomlyPick(non_reachable)
+        for time in range(0, n - 1):
+            fr = getSetRandomlyPick(reachable)
+            to = getSetRandomlyPick(non_reachable)
 
-			reachable.add(to)
-			non_reachable.discard(to)
+            reachable.add(to)
+            non_reachable.discard(to)
 
-			nodeFr = graph.getNode(fr)
-			nodeTo = graph.getNode(to)
+            nodeFr = graph.getNode(fr)
+            nodeTo = graph.getNode(to)
 
-			if operator:
-				val = operator(nodeFr,nodeTo)
-				graph.addEdge(fr, to, val)
+            if operator:
+                val = operator(nodeFr,nodeTo)
+                graph.addEdge(fr, to, val)
 
 
 if __name__ == "__main__":
-	graphInfo = GraphInfo()
-	graphInfo.energy = (10, 40)
-	graphInfo.numberNodes = 10
+    graphInfo = GraphInfo()
+    graphInfo.energy = (10, 40)
+    graphInfo.numberNodes = 10
 
-	myGraph = Graph.generate(graphInfo)
+    myGraph = Graph.generate(graphInfo)
 
-	# myGraph.printInfo()
+    # myGraph.printInfo()
 
-	generator = SpaningTreeGenerator()
-	generator.generate(myGraph, weightEnergy)
+    generator = SpaningTreeGenerator()
+    generator.generate(myGraph, weightEnergy)
 
-	# print
-	# myGraph.printInfo()
+    # print
+    # myGraph.printInfo()
 
-	edgeGenerator = EdgeAppendGenerator()
-	edgeGenerator.generate(myGraph, 10)
+    edgeGenerator = EdgeAppendGenerator()
+    edgeGenerator.generate(myGraph, 10)
 
-	# print
-	myGraph.printInfo()
+    # print
+    myGraph.printInfo()
 
-	myGraph.saveEdgesInFile("out.grp")
-	myGraph.saveAsPickleInFile("out.pkl")
+    myGraph.saveEdgesInFile("out.grp")
+    myGraph.saveAsPickleInFile("out.pkl")
