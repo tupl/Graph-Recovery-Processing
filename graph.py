@@ -1,4 +1,27 @@
+"""
+Author: tuleph@gmail.com
+
+Goal: The purpose of this code is to generate a synthetic graph to test
+    the correction phase.
+
+Algorithm:
+
+    - creating spanning tree
+    - randomly adding a number of new edges
+
+Commandline Interface:
+
+    -l lower energy
+    -u high energy
+    -n number of nodes
+    -e number of edges
+    -o output file all the edges in the graph
+    -p output the picke holding information of the graph
+"""
+
 from sets import Set
+
+import sys, getopt
 import random
 
 class Edge(object):
@@ -134,7 +157,7 @@ class Graph(object):
         if fr in self.adjList and to in self.adjList[fr]:
             self.adjList[fr][to] += sf_weight
         elif to in self.adjList and fr in self.adjList[to]:
-            self.adjList[to][fr] -= sf_weight      
+            self.adjList[to][fr] -= sf_weight
 
     def getAdjListOfNode(self, fr):
         return self.adjList[fr]
@@ -284,27 +307,85 @@ class SpaningTreeGenerator(object):
                 val = operator(nodeFr,nodeTo)
                 graph.addEdge(fr, to, val)
 
+def main(argv):
+    """
+        -l lower energy, default value is 10
+        -u high energy, default value is 40
+        -n number of nodes
+        -e number of edges
+        -o output file all the edges in the graph
+        -p output the picke holding information of the graph
+    """
+    lowEnergy = 10
+    upperEnergy = 40
 
-if __name__ == "__main__":
+    numberNodes = 10
+    numberEdges = 30
+
+    outputEdge = "out.grp"
+    outputPickle = "out.pkl"
+
+    try:
+        opts, args = getopt.getopt(argv,"hl:u:n:e:o:p:"
+            ,[  "help"
+                "lower=", "upper=",
+                "nodes=", "edges=",
+                "outputEdge=",
+                "outputPickle"])
+    except getopt.GetoptError:
+        sys.exit(2)
+
+    for opt, arg in opts:
+        if opt in ("-h", "--help"):
+            sys.exit()
+        elif opt in ("-l", "--lower"):
+            lowEnergy = int(arg)
+        elif opt in ("-u", "--upper"):
+            upperEnergy = int(arg)
+        elif opt in ("-n", "--nodes"):
+            numberNodes = int(arg)
+        elif opt in ("-e", "--edges"):
+            numberEdges = int(arg)
+        elif opt in ("-o", "--outputEdge"):
+            outputEdge = arg
+        elif opt in ("-p", "--outputPickle"):
+            outputPickle = arg
+
+    print("Energy: " + str((lowEnergy, upperEnergy)))
+    print("Number of nodes: " + str(numberNodes))
+    print("Number of edges: " + str(numberEdges))
+    print("Output of edges: " + outputEdge)
+    print("Output of pickle: " + outputPickle)
+    print
+
+    print("Start generating synthetic graphs.")
+
     graphInfo = GraphInfo()
-    graphInfo.energy = (10, 40)
-    graphInfo.numberNodes = 10
+    graphInfo.energy = (lowEnergy, upperEnergy)
+    graphInfo.numberNodes = numberNodes
 
     myGraph = Graph.generate(graphInfo)
 
-    # myGraph.printInfo()
-
     generator = SpaningTreeGenerator()
+
+    print("Generating spanning tree.")
     generator.generate(myGraph, weightEnergy)
 
-    # print
-    # myGraph.printInfo()
-
     edgeGenerator = EdgeAppendGenerator()
-    edgeGenerator.generate(myGraph, 10)
 
-    # print
-    myGraph.printInfo()
+    numberEdges -= (numberNodes - 1)
 
-    myGraph.saveEdgesInFile("out.grp")
-    myGraph.saveAsPickleInFile("out.pkl")
+    if numberEdges < 0:
+        print(  "The number of edges has to be at least n - 1 (n is number of"
+                "nodes)")
+        sys.exit(2)
+
+    print("Adding extra edges.")
+    edgeGenerator.generate(myGraph, numberEdges)
+
+    myGraph.saveEdgesInFile(outputEdge)
+    myGraph.saveAsPickleInFile(outputPickle)
+    print("Finish writing output.")
+
+if __name__ == "__main__":
+    main(sys.argv[1:])

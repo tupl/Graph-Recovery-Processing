@@ -262,6 +262,8 @@ def GradientDescent(graph, badCycles, cycles, edgeTrker):
     n = len(X_Error)
     x_0 = np.zeros((1, n))
 
+    import math
+
     for idx, edge in enumerate(X_Error):
         x_0[0, idx] = vGraph.getWeightWithEdge(edge)
 
@@ -281,7 +283,7 @@ def GradientDescent(graph, badCycles, cycles, edgeTrker):
 
         err_val = np.dot(err, err.T)
 
-        return err_val[0][0]
+        return math.log(2 + err_val[0][0])
 
     from scipy import optimize
 
@@ -297,8 +299,6 @@ def GradientDescent(graph, badCycles, cycles, edgeTrker):
             disp = 0,
             maxfun = 1000
         )
-
-        print(EvaluateFunction(x_val))
 
         x_0 = x_val
         times += 1
@@ -410,18 +410,18 @@ if __name__ == "__main__":
     badCycles, edgeTrker = getSortedListBadEdges(graph, cycles)
 
     # using least square
-    pred_edges = LeastSquareInitPoint(graph, badCycles, cycles, edgeTrker)
-    evaluator = GraphEvaluator()
-    evaluator.getError(graph, pred_edges)
+    # pred_edges = LeastSquareInitPoint(graph, badCycles, cycles, edgeTrker)
+    # evaluator = GraphEvaluator()
+    # evaluator.getError(graph, pred_edges)
 
-    pred_edges = LeastSquareInitPoint(graph, badCycles, cycles, edgeTrker, includeGood = True)
-    evaluator = GraphEvaluator()
-    evaluator.getError(graph, pred_edges)
+    # pred_edges = LeastSquareInitPoint(graph, badCycles, cycles, edgeTrker, includeGood = True)
+    # evaluator = GraphEvaluator()
+    # evaluator.getError(graph, pred_edges)
 
-    for idx, edge in enumerate(pred_edges):
-        fr = edge.fr
-        to = edge.to
-        graph.updateEdge(fr, to, edge.weight)
+    # for idx, edge in enumerate(pred_edges):
+    #     fr = edge.fr
+    #     to = edge.to
+    #     graph.updateEdge(fr, to, edge.weight)
 
     # using gradient GradientDescent
     pred_edges = GradientDescent(graph, badCycles, cycles, edgeTrker)
