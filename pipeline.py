@@ -21,22 +21,13 @@ from util import *
 graphPath = "resource"
 perputatingPath = "perputation"
 
-    """
-        -i input file
-        -g, --good (low, high)
-        -b, --bad (low, high)
-        -o output list of bad edges
-        -p output the picke holding new graph
-        -t percent of bad edges
-    """
-
 def GraphPerputatorPhase():
     for epara in perparams:
         call([  "python", "perputator.py",
                 "-i", graphPath + "/" + epara.inputFile,
                 "-g", tupleToStr(epara.good),
                 "-b", tupleToStr(epara.bad),
-                "-t", epara.percent,
+                "-t", str(epara.percent),
                 "-p", perputatingPath + "/" + epara.outputFile
             ])
 
