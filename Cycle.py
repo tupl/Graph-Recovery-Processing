@@ -1,3 +1,16 @@
+"""
+Author: tuleph@gmail.com
+
+Goal: The purpose of this code is to correct the value of edge and evaluate
+    the performance
+
+Algorithm:
+
+
+Commandline Interface:
+
+"""
+
 from sets import Set
 from graph import *
 import math
@@ -235,7 +248,7 @@ def getSortedListBadEdges(graph, cycles):
 def GradientDescent(graph, badCycles, cycles, edgeTrker):
 
     import copy
-    
+
     edges = Set([])
 
     vGraph = copy.deepcopy(graph)
@@ -380,7 +393,7 @@ class GraphEvaluator(object):
         for col, edge in enumerate(edges):
 
             pred = edge.weight
-            
+
             fr = edge.fr
             to = edge.to
             real = weightEnergy(graph.getNode(fr),
