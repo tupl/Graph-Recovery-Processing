@@ -6,6 +6,8 @@ Goal: This script's purpose is to construct a pipeline
 Pipeline:
     -- Generating a synthetic graph
 
+    -- Randomly perputating edge in graph
+
     -- Correcting the synthetic graph
 
 Commandline Interface:
