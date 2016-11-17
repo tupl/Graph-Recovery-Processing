@@ -224,38 +224,6 @@ class EdgeAppendGenerator(object):
 
             graph.addEdge(fr, to, weightEnergy(nodeFr, nodeTo))
 
-class GraphPerputator(object):
-
-    def __init__(self, small, large):
-        self.small = small
-        self.large = large
-
-    def execute(self, graph, percent):
-
-        small = self.small
-        large = self.large
-        err = []
-
-        print("Perputating the graph")
-        for fr in graph.adjList:
-            for to in graph.adjList[fr]:
-                prob = random.random()
-                val = 0
-                # how many percent random large
-                if prob <= percent:
-                    val = random.uniform(large[0], large[1])
-                else:
-                    val = random.uniform(small[0], small[1])
-                # print("%f --> %f" %
-                #     (graph.adjList[fr][to],
-                #      graph.adjList[fr][to] + val
-                #     ))
-                err.append(val)
-                graph.shiftEdge(fr, to, val)
-
-        import numpy as np
-        print(np.absolute(np.array(err)))
-
 class SpaningTreeGenerator(object):
     """
         It takes a Graph object, and add edge to make it
@@ -358,7 +326,7 @@ def main(argv):
     print("Output of pickle: " + outputPickle)
     print
 
-    print("Start generating synthetic graphs.")
+    print("Start generating synthetic graphs")
 
     graphInfo = GraphInfo()
     graphInfo.energy = (lowEnergy, upperEnergy)
@@ -368,7 +336,7 @@ def main(argv):
 
     generator = SpaningTreeGenerator()
 
-    print("Generating spanning tree.")
+    print("Generating spanning tree")
     generator.generate(myGraph, weightEnergy)
 
     edgeGenerator = EdgeAppendGenerator()
@@ -376,16 +344,13 @@ def main(argv):
     numberEdges -= (numberNodes - 1)
 
     if numberEdges < 0:
-        print(  "The number of edges has to be at least n - 1 (n is number of"
-                "nodes)")
-        sys.exit(2)
+        print("The number of edges has to be at least n - 1 (n is number of nodes)")
 
-    print("Adding extra edges.")
+    print("Adding extra edges)
     edgeGenerator.generate(myGraph, numberEdges)
 
     myGraph.saveEdgesInFile(outputEdge)
     myGraph.saveAsPickleInFile(outputPickle)
-    print("Finish writing output.")
 
 if __name__ == "__main__":
     main(sys.argv[1:])
