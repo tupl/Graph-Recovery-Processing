@@ -2,6 +2,8 @@
     The purpose of this one is to randomly perpuate an edge in a graph
 """
 from graph import *
+from util import *
+
 import sys, getopt
 
 class GraphPerputator(object):
@@ -29,12 +31,6 @@ class GraphPerputator(object):
                 graph.shiftEdge(fr, to, val)
 
         import numpy as np
-
-def strToTuple(strTuple):
-    ret = strTuple.split(",")
-    first = int(ret[0])
-    second = int(ret[1])
-    return (first, second)
 
 def main(argv):
     """

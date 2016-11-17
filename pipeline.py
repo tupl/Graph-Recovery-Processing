@@ -16,15 +16,39 @@ Commandline Interface:
 
 from parameters import *
 from subprocess import call
+from util import *
 
-ouputFolder = "resource"
+graphPath = "resource"
+perputatingPath = "perputation"
 
-for epara in params:
-    call([  "python", "graph.py",
-            "-l", str(epara.energy[0]),
-            "-u", str(epara.energy[1]),
-            "-n", str(epara.nnode),
-            "-e", str(epara.nedge),
-            "-o", ouputFolder + "/" + epara.outputEdge,
-            "-p", ouputFolder + "/" + epara.outputPickle
-        ])
+    """
+        -i input file
+        -g, --good (low, high)
+        -b, --bad (low, high)
+        -o output list of bad edges
+        -p output the picke holding new graph
+        -t percent of bad edges
+    """
+
+def GraphPerputatorPhase():
+    for epara in perparams:
+        call([  "python", "perputator.py",
+                "-i", graphPath + "/" + epara.inputFile,
+                "-g", tupleToStr(epara.good),
+                "-b", tupleToStr(epara.bad),
+                "-t", epara.percent,
+                "-p", perputatingPath + "/" + epara.outputFile
+            ])
+
+def GraphGeneratePhase():
+    for epara in params:
+        call([  "python", "graph.py",
+                "-l", str(epara.energy[0]),
+                "-u", str(epara.energy[1]),
+                "-n", str(epara.nnode),
+                "-e", str(epara.nedge),
+                "-o", graphPath + "/" + epara.outputEdge,
+                "-p", graphPath + "/" + epara.outputPickle
+            ])
+if __name__ == "__main__":
+    GraphPerputatorPhase()
