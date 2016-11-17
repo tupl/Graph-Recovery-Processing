@@ -13,10 +13,12 @@ Commandline Interface:
 
 from sets import Set
 from graph import *
+
 import math
 import numpy as np
+import sys
 
-EPS = 2.0
+EPS = 1.0
 
 class Cycle(object):
 
@@ -231,7 +233,6 @@ def getSortedListBadEdges(graph, cycles):
             badCycles.append(cycle)
 
     # STEP 2
-
     # for each bad cycle
     for cycle in badCycles:
 
@@ -352,14 +353,10 @@ def LeastSquareInitPoint(graph, badCycles, cycles, edgeTrker, includeGood=False)
     n = len(X_Error)
     m = len(badCycles)
 
-    print("Matrix size = %d x %d" % (m, n))
-    print(X_Error)
-
     A = np.zeros((m, n))
     b = np.zeros((m, 1))
 
     # Setting up matrix A
-
     for row, cycle in enumerate(badCycles):
 
         # for each edge in X
@@ -386,46 +383,107 @@ class GraphEvaluator(object):
     def getError(self, graph, edges):
 
         n = len(edges)
-        err = np.zeros((1, n))
 
-        print
+        OriErr = np.zeros((1, n))
+        PredErr = np.zeros((1, n))
+
+        print("====================")
         print("Summary of statistics of error")
         for col, edge in enumerate(edges):
 
-            pred = edge.weight
-
+            # Information about node
             fr = edge.fr
             to = edge.to
+
+            pred = edge.weight
+            ori = graph.getWeightWithEdge(Edge(fr, to))
+
+            # Expected Value
             real = weightEnergy(graph.getNode(fr),
                 graph.getNode(to))
 
-            err[0, col] = pred - real
+            OriErr[0, col] = ori - real
+            PredErr[0, col] = pred - real
 
-        print("Mean Error = %f" % np.mean(err))
-        print("Std Error = %f" % np.std(err))
-        print("Max Error = %f" % np.amax(np.absolute(err)))
+        print("====================")
+        print("Original Error")
+        print("Mean Error = %f" % np.mean(OriErr))
+        print("Std Error = %f" % np.std(OriErr))
+        print("Max Error = %f" % np.amax(np.absolute(OriErr)))
 
+        print("====================")
+        print("Predicted Error")
+        print("Mean Error = %f" % np.mean(PredErr))
+        print("Std Error = %f" % np.std(PredErr))
+        print("Max Error = %f" % np.amax(np.absolute(PredErr)))
 
+def histogramCycle(cycles):
+    counter = {}
+
+    for cycle in cycles:
+        cycleLen = len(cycle)
+
+        if cycleLen not in counter:
+            counter[cycleLen] = 0
+
+        counter[cycleLen] += 1
+
+    return counter
+
+def filterCycle(cycles, threshold):
+    ret = []
+
+    for cycle in cycles:
+        if len(cycle) <= threshold:
+            ret.append(cycle)
+
+    return ret
 
 if __name__ == "__main__":
+    """
+
+    """
+    graphPath = sys.argv[1]
+    orderPath = sys.argv[2]
+    cyclesPath = sys.argv[3]
+
+    EPS = 10.0
+
     # get the list of edges from the file
-    orders = readEdgeOrder("order.txt")
-    cycles = readCycleMatrix("matrix.txt", orders)
-    graph = Graph.loadAsPickleInFile("out.pkl")
+    orders = readEdgeOrder(orderPath)
+    cycles = readCycleMatrix(cyclesPath, orders)
+    graph = Graph.loadAsPickleInFile(graphPath)
 
-    # graph.printInfo()
+    cycleHist = histogramCycle(cycles)
 
-    # update 1 -> 8
-    perputator = GraphPerputator((0, 2), (10, 20))
-    percent = 0.3
-    perputator.execute(graph, percent)
+    print(cycleHist)
 
+    cycleThreshold = 7
+    print("Dicarding all cycles greater than " + str(cycleThreshold))
+    cycles = filterCycle(cycles, cycleThreshold)
+
+    # get a list of bad cycles in the graph
     badCycles, edgeTrker = getSortedListBadEdges(graph, cycles)
 
+    print
+    print("Current threshold = " + str(EPS))
+    print("Original number of cycles = " + str(len(cycles)))
+    print("Predicted number of bad cycles = " + str(len(badCycles)))
+
+    print
+    numberBadEdges = len(edgeTrker.bads)
+    totalEdges = graph.numberEdges
+    print("This result only includes error coming from predicted bad edges.")
+    print("Total number of nodes = " + str(graph.getNumberOfNodes()))
+    print("Number of bad edges found = " + str(numberBadEdges))
+    print("Total Number of edges = " + str(totalEdges))
+    print("Percentage = " + str(numberBadEdges * 100.0 / totalEdges))
+    print
+
     # using least square
-    # pred_edges = LeastSquareInitPoint(graph, badCycles, cycles, edgeTrker)
-    # evaluator = GraphEvaluator()
-    # evaluator.getError(graph, pred_edges)
+    pred_edges = LeastSquareInitPoint(graph, badCycles, cycles, edgeTrker)
+    evaluator = GraphEvaluator()
+    evaluator.getError(graph, pred_edges)
 
     # pred_edges = LeastSquareInitPoint(graph, badCycles, cycles, edgeTrker, includeGood = True)
     # evaluator = GraphEvaluator()
@@ -437,6 +495,6 @@ if __name__ == "__main__":
     #     graph.updateEdge(fr, to, edge.weight)
 
     # using gradient GradientDescent
-    pred_edges = GradientDescent(graph, badCycles, cycles, edgeTrker)
-    evaluator = GraphEvaluator()
-    evaluator.getError(graph, pred_edges)
+    # pred_edges = GradientDescent(graph, badCycles, cycles, edgeTrker)
+    # evaluator = GraphEvaluator()
+    # evaluator.getError(graph, pred_edges)

@@ -27,6 +27,12 @@ class GraphPerputator(object):
                     val = random.uniform(large[0], large[1])
                 else:
                     val = random.uniform(small[0], small[1])
+
+                # add negative or positive
+                prob = random.random()
+                if prob < 0.5:
+                    val = -val;
+
                 err.append(val)
                 graph.shiftEdge(fr, to, val)
 

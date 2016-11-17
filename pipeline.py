@@ -20,6 +20,17 @@ from util import *
 
 graphPath = "resource"
 perputatingPath = "perputation"
+cyclePath = "cycles"
+
+def GraphCyclePhase():
+    for epara in cycparams:
+        call([  "java", "-jar", "CycleFinder.jar",
+                graphPath + "/" + epara.inputFile,
+                cyclePath + "/" + epara.outputOrder,
+                cyclePath + "/" + epara.outputCycle,
+                str(epara.minCycle),
+                str(epara.maxIteration)
+            ])
 
 def GraphPerputatorPhase():
     for epara in perparams:
@@ -31,6 +42,9 @@ def GraphPerputatorPhase():
                 "-p", perputatingPath + "/" + epara.outputFile
             ])
 
+def GraphEvaluator():
+
+
 def GraphGeneratePhase():
     for epara in params:
         call([  "python", "graph.py",
@@ -41,5 +55,10 @@ def GraphGeneratePhase():
                 "-o", graphPath + "/" + epara.outputEdge,
                 "-p", graphPath + "/" + epara.outputPickle
             ])
+
+
+
 if __name__ == "__main__":
-    GraphPerputatorPhase()
+    # GraphGeneratePhase()
+    GraphCyclePhase()
+    # GraphPerputatorPhase()
