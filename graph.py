@@ -346,7 +346,7 @@ def main(argv):
     if numberEdges < 0:
         print("The number of edges has to be at least n - 1 (n is number of nodes)")
 
-    print("Adding extra edges)
+    print("Adding extra edges")
     edgeGenerator.generate(myGraph, numberEdges)
 
     myGraph.saveEdgesInFile(outputEdge)

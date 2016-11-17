@@ -2,6 +2,7 @@
     The purpose of this one is to randomly perpuate an edge in a graph
 """
 from graph import *
+import sys, getopt
 
 class GraphPerputator(object):
 
@@ -15,7 +16,6 @@ class GraphPerputator(object):
         large = self.large
         err = []
 
-        print("Perputating the graph")
         for fr in graph.adjList:
             for to in graph.adjList[fr]:
                 prob = random.random()
@@ -36,7 +36,7 @@ def strToTuple(strTuple):
     second = int(ret[1])
     return (first, second)
 
-def main(args):
+def main(argv):
     """
         -i input file
         -g, --good (low, high)
@@ -79,12 +79,21 @@ def main(args):
         elif opt in ("-p", "--outputPickle"):
             outputPickle = arg
         elif opt in ("-t"):
-            percent = int(arg)
+            percent = float(arg)
     try:
+        print("Loaded the graph from " + inputGraph)
         graph = Graph.loadAsPickleInFile(inputGraph)
         perputator = GraphPerputator(good, bad)
+
+        print("Start perputating the graph")
         perputator.execute(graph, percent)
-    except err:
+        print("Finish perputating the graph")
+
+        # save graph into destination
+        graph.saveAsPickleInFile(outputPickle)
+        print("Saved the graph to " + outputPickle)
+
+    except Exception as err:
         print(err)
 
 if __name__ == "__main__":
