@@ -455,10 +455,11 @@ if __name__ == "__main__":
     graph = Graph.loadAsPickleInFile(graphPath)
 
     cycleHist = histogramCycle(cycles)
-
-    print(cycleHist)
-
     cycleThreshold = 7
+
+    print
+    print("===== ===== ===== ===== =====")
+    print("File name : " + graphPath)
     print("Dicarding all cycles greater than " + str(cycleThreshold))
     cycles = filterCycle(cycles, cycleThreshold)
 
