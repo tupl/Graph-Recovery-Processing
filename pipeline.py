@@ -43,7 +43,12 @@ def GraphPerputatorPhase():
             ])
 
 def GraphEvaluator():
-
+    for epara in evalparams:
+        call([  "python", "Cycle.py",
+                perputatingPath + "/" + epara.graph,
+                cyclePath + "/" + epara.order,
+                cyclePath + "/" + epara.matrix
+            ])
 
 def GraphGeneratePhase():
     for epara in params:
@@ -60,5 +65,6 @@ def GraphGeneratePhase():
 
 if __name__ == "__main__":
     # GraphGeneratePhase()
-    GraphCyclePhase()
+    # GraphCyclePhase()
     # GraphPerputatorPhase()
+    GraphEvaluator()

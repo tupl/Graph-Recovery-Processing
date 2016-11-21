@@ -15,6 +15,13 @@ class GraphParam(object):
         self.outputEdge = outputEdge
         self.outputPickle = outputPickle
 
+class EvalParam(object):
+
+    def __init__(self, graph, order, matrix):
+        self.graph = graph
+        self.order = order
+        self.matrix = matrix
+
 class CycleParam(object):
 
     def __init__(self, inputFile, outputOrder, outputCycle, minCycle, maxIteration):
@@ -32,6 +39,20 @@ class PerputatingParam(object):
         self.percent = percent
         self.inputFile = inputFile
         self.outputFile = outputFile
+
+evalparams = [
+    EvalParam("10_25-1.pkl", "10_25-1.ord", "10_25-1.mat"),
+    EvalParam("10_25-2.pkl", "10_25-2.ord", "10_25-2.mat"),
+    EvalParam("10_25-3.pkl", "10_25-3.ord", "10_25-3.mat"),
+
+    EvalParam("20_50-1.pkl", "20_50-1.ord", "20_50-1.mat"),
+    EvalParam("20_50-2.pkl", "20_50-2.ord", "20_50-2.mat"),
+    EvalParam("20_50-3.pkl", "20_50-3.ord", "20_50-3.mat"),
+
+    EvalParam("40_100-1.pkl", "40_100-1.ord", "40_100-1.mat"),
+    EvalParam("40_100-2.pkl", "40_100-2.ord", "40_100-2.mat"),
+    EvalParam("40_100-3.pkl", "40_100-3.ord", "40_100-3.mat")
+]
 
 cycparams = [
     CycleParam("10_25-1.grp", "10_25-1.ord", "10_25-1.mat", 10, 10000),
