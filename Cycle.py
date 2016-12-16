@@ -330,6 +330,10 @@ def LeastSquareInitPoint(graph, badCycles, cycles, edgeTrker, includeGood=False)
     """
         It requires graph & edgeTrker to recover
     Procedure
+        Phase 1: Adding all bad edges into a list of edges to consider
+                 (We will add good edges too if we set includeGood)
+
+        Phase 2:
     """
 
     b = []
@@ -348,13 +352,16 @@ def LeastSquareInitPoint(graph, badCycles, cycles, edgeTrker, includeGood=False)
                 edge.reverse() not in edges:
                 edges.add(edge)
 
+    # Convert the edges into a list
     X_Error = list(edges)
 
-    n = len(X_Error)
-    m = len(badCycles)
+    n = len(X_Error) # n edges
+    m = len(badCycles) # m cycles
 
     A = np.zeros((m, n))
     b = np.zeros((m, 1))
+
+    np.set_printoptions(threshold=np.inf)
 
     # Setting up matrix A
     for row, cycle in enumerate(badCycles):
@@ -367,7 +374,12 @@ def LeastSquareInitPoint(graph, badCycles, cycles, edgeTrker, includeGood=False)
 
         b[row, 0] = cycle.consistency(graph)
 
-    x_Solu, residuals, rank, s = np.linalg.lstsq(A, b)
+
+    # x_Solu, residuals, rank, s = np.linalg.lstsq(A, b, 5.0)
+
+    import scipy
+    from scipy import linalg
+    x_Solu, residuals, rank, s = linalg.lstsq(A, b, lapack_driver = "gelss")
 
     ret = []
 
@@ -447,7 +459,7 @@ if __name__ == "__main__":
     orderPath = sys.argv[2]
     cyclesPath = sys.argv[3]
 
-    EPS = 10.0
+    EPS = 2.0
 
     # get the list of edges from the file
     orders = readEdgeOrder(orderPath)
@@ -482,7 +494,7 @@ if __name__ == "__main__":
     print
 
     # using least square
-    pred_edges = LeastSquareInitPoint(graph, badCycles, cycles, edgeTrker)
+    pred_edges = LeastSquareInitPoint(graph, badCycles, cycles, edgeTrker, includeGood=False)
     evaluator = GraphEvaluator()
     evaluator.getError(graph, pred_edges)
 

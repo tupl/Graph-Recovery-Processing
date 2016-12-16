@@ -80,6 +80,9 @@ class Graph(object):
     """
         Construct a directed graph.
     """
+    def toCytoscape(destFile):
+        pass
+
     @staticmethod
     def generate(graphInfo):
 
